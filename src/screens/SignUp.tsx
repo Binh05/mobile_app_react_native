@@ -3,7 +3,6 @@ import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
@@ -12,10 +11,8 @@ import {
   Pressable,
   Image,
 } from "react-native";
+import { TextInput } from "react-native-paper";
 import CustomButton from "../component/customButton";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useState } from "react";
 import TextTouch from "../component/textTouch";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -27,10 +24,15 @@ const SignUp = () => {
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [isPasswoedVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const handleOnSubmit = () => {
     alert(user);
   };
+
+  const specicalCharRegex = /[^a-zA-Z0-9]/
+  if (specicalCharRegex.test(password)) {
+    alert("Mat khau khong duoc co ky tu dac biet")
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -68,44 +70,32 @@ const SignUp = () => {
             </View>
 
             <View style={styles.inputSection}>
-              <FontAwesome
-                style={styles.icon}
-                name="user-circle-o"
-                size={20}
-                color="black"
-              />
+              
               <TextInput
                 style={styles.textInput}
+                mode="outlined"
+                label="Email"
                 placeholder="Enter your email"
-                value={user}
-                onChangeText={setUser}
+                left={<TextInput.Icon icon="account-circle"/>}
               />
             </View>
 
             <View style={styles.inputSection}>
-              <Fontisto
-                style={[styles.icon, { marginLeft: 17, marginRight: 17 }]}
-                name="locked"
-                size={20}
-                color="black"
-              />
+              
               <TextInput
                 style={styles.textInput}
+                mode="outlined"
+                label="Password"
                 placeholder="******"
-                secureTextEntry={!isPasswoedVisible}
-                value={password}
+                left={<TextInput.Icon icon="lock"/>}
+                right={<TextInput.Icon icon={isPasswordVisible ? "eye-off" : "eye"} onPress={() => setIsPasswordVisible(!isPasswordVisible)}/>}
+                secureTextEntry={!isPasswordVisible}
                 onChangeText={setPassword}
               />
-              <Pressable onPress={() => setIsPasswordVisible(!isPasswoedVisible)}>
-                <FontAwesome5
-                  style={styles.icon}
-                  name={isPasswoedVisible ? "eye-slash" : "eye"}
-                  size={20}
-                  color="black"
-                />
-              </Pressable>
+              
             </View>
 
+            
             <CustomButton onPress={handleOnSubmit} title={"Sign up"} />
           </View>
         </View>
@@ -157,8 +147,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "black",
     borderRadius: 5,
     width: 300,
     height: 45,

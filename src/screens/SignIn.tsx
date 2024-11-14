@@ -8,7 +8,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   TouchableWithoutFeedback,
   View,
   Image,
@@ -21,11 +20,14 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import TextTouch from "../component/textTouch";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import CustomCheckbox from "../component/checkbox";
-import { useAppDispatch } from "../hooks/hook";
-import { setUser } from "../slices/userSlice/userSlice";
+import { useAppDispatch, useAppSelector } from "../hooks/hook";
+import { TextInput } from "react-native-paper";
+import { setUser, clearUser } from "../slices/userSlice/userSlice";
+import { RootState } from "../store/store";
 
 const SignIn = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch()
   const [userinfo, setUserInfo] = useState("");
   const [password, setPassword] = useState("");
@@ -33,9 +35,24 @@ const SignIn = () => {
   const [remember, setRemember] = useState(false);
   const handleOnSubmit = () => {
     dispatch(setUser({ name: userinfo, email: `${password}` }));
-    navigation.navigate("home");
+    if (!user || !user.name || !user.email) {
+      alert("Nhập đầy đủ tài khoản hoặc mật khẩu");
+    }else {
+      navigation.navigate("Maintabs");
+      dispatch(clearUser());
+    }
 
   };
+
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+  if (!emailRegex.test(userinfo)) {
+    
+  }
+
+  if (password.length < 6) {
+    
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -73,42 +90,30 @@ const SignIn = () => {
             </View>
 
             <View style={styles.inputSection}>
-              <FontAwesome
-                style={styles.icon}
-                name="user-circle-o"
-                size={20}
-                color="black"
-              />
+              
               <TextInput
                 style={styles.textInput}
+                mode="outlined"
+                label="Email"
                 placeholder="Enter your email"
+                left={<TextInput.Icon icon="account-circle"/>}
                 onChangeText={setUserInfo}
               />
             </View>
 
             <View style={styles.inputSection}>
-              <Fontisto
-                style={[styles.icon, { marginLeft: 17, marginRight: 17 }]}
-                name="locked"
-                size={20}
-                color="black"
-              />
+              
               <TextInput
                 style={styles.textInput}
+                mode="outlined"
+                label="Password"
                 placeholder="******"
+                left={<TextInput.Icon icon="lock"/>}
+                right={<TextInput.Icon icon={!isPasswordVisible ? "eye" : "eye-off"} onPress={() => setIsPasswordVisible(!isPasswordVisible)}/>}
                 secureTextEntry={!isPasswordVisible}
                 onChangeText={setPassword}
               />
-              <Pressable
-                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-              >
-                <FontAwesome5
-                  style={styles.icon}
-                  name={isPasswordVisible ? "eye-slash" : "eye"}
-                  size={20}
-                  color="black"
-                />
-              </Pressable>
+              
             </View>
 
             <CustomButton title="Sign In" onPress={handleOnSubmit} />
@@ -165,8 +170,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "black",
     borderRadius: 5,
     width: 300,
     height: 45,
